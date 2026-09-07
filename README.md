@@ -4,6 +4,11 @@
 질문을 입력하면 서버가 Anthropic Claude API 를 호출해 답변을 생성하고, 모든 대화를
 DB 에 누적 저장한다.
 
+- **배포 URL**: https://ai-chatbot-service-3gry.onrender.com
+- **저장소**: https://github.com/hyunjuarchive/ai-chatbot-service
+- 호스팅: Render (Singapore, free) · `main` 브랜치 push 시 자동 재배포
+- 무료 인스턴스는 15분 미사용 시 슬립 → 첫 요청에 ~40초. 재시작 시 SQLite 초기화.
+
 ---
 
 ## 1. 프로젝트 개요
@@ -151,6 +156,23 @@ pytest -q
 ```
 
 ## 8. 배포
+
+### 현재 운영 중 (Render)
+
+이 저장소는 Render 웹 서비스로 배포되어 있다.
+
+- URL: https://ai-chatbot-service-3gry.onrender.com
+- 런타임: Python 3.12 (native), Region: Singapore, Plan: free
+- Build: `pip install -r requirements.txt`
+- Start: `uvicorn app.main:app --host 0.0.0.0 --port $PORT`
+- Health check: `/healthz`
+- `main` 브랜치에 push 하면 자동 재배포 (`autoDeploy=yes`).
+- 환경변수는 Render 대시보드 > 서비스 > Environment 에서 관리
+  (`ANTHROPIC_AUTH_TOKEN`, `ANTHROPIC_BASE_URL`, `ANTHROPIC_MODEL`, `SESSION_SECRET` 등).
+  `render.yaml` 은 Blueprint 재생성용 참고 파일.
+
+새 환경에서 재현하려면: Render Dashboard → New → Blueprint → 이 저장소 선택 →
+`render.yaml` 자동 적용 → `ANTHROPIC_AUTH_TOKEN` 만 직접 입력.
 
 ### Railway
 1. GitHub 저장소 연결 → `railway.json` 자동 인식(NIXPACKS).
