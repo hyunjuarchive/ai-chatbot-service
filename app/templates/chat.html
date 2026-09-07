@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+{% block title %}채팅{% endblock %}
+{% block content %}
+<section class="chat-wrap">
+  <div id="messages" class="messages">
+    {% for row in history %}
+      <div class="msg user"><div class="bubble">{{ row.question }}</div></div>
+      {% if row.status == 'success' %}
+        <div class="msg bot"><div class="bubble">{{ row.answer }}</div></div>
+      {% else %}
+        <div class="msg bot error"><div class="bubble">⚠️ 이전 요청은 오류로 응답하지 못했습니다.</div></div>
+      {% endif %}
+    {% else %}
+      <p class="empty">첫 질문을 입력해 보세요.</p>
+    {% endfor %}
+  </div>
+
+  <form id="chat-form" class="chat-input">
+    <textarea id="message" name="message" rows="2" maxlength="{{ 2000 }}"
+              placeholder="질문을 입력하세요 (Enter 전송, Shift+Enter 줄바꿈)" required></textarea>
+    <button type="submit" id="send" class="btn">전송</button>
+  </form>
+  <p id="status" class="status"></p>
+</section>
+
+<script>
+const form = document.getElementById('chat-form');
+const input = document.getElementById('message');
+const messages = document.getElementById('messages');
+const statusEl = document.getElementById('status');
+const sendBtn = document.getElementById('send');
+
+function addMsg(text, cls) {
+  const empty = messages.querySelector('.empty');
+  if (empty) empty.remove();
+  const wrap = document.createElement('div');
+  wrap.className = 'msg ' + cls;
+  const bubble = document.createElement('div');
+  bubble.className = 'bubble';
+  bubble.textContent = text;
+  wrap.appendChild(bubble);
+  messages.appendChild(wrap);
+  messages.scrollTop = messages.scrollHeight;
+  return bubble;
+}
+
+async function send() {
+  const text = input.value.trim();
+  if (!text) return;
+  addMsg(text, 'user');
+  input.value = '';
+  sendBtn.disabled = true;
+  statusEl.textContent = 'AI가 응답 중...';
+  const pending = addMsg('…', 'bot pending');
+
+  try {
+    const res = await fetch('/api/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ message: text }),
+    });
+    const data = await res.json();
+    if (!res.ok) {
+      pending.parentElement.classList.add('error');
+      pending.textContent = '⚠️ ' + (data.detail || '오류가 발생했습니다.');
+    } else {
+      pending.parentElement.classList.remove('pending');
+      pending.textContent = data.answer;
+      if (data.mocked) statusEl.textContent = '(테스트 응답: AI 키 미설정)';
+      else statusEl.textContent = '';
+    }
+  } catch (err) {
+    pending.parentElement.classList.add('error');
+    pending.textContent = '⚠️ 네트워크 오류. 잠시 후 다시 시도해 주세요.';
+  } finally {
+    sendBtn.disabled = false;
+    pending.parentElement.classList.remove('pending');
+  }
+}
+
+form.addEventListener('submit', (e) => { e.preventDefault(); send(); });
+input.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); }
+});
+messages.scrollTop = messages.scrollHeight;
+</script>
+{% endblock %}

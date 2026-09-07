@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>{% block title %}AI 챗봇{% endblock %}</title>
+  <link rel="stylesheet" href="/static/style.css" />
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="/">🤖 AI 챗봇</a>
+    <nav>
+      {% if current_user %}
+        <a href="/chat">채팅</a>
+        <a href="/logs">내 로그</a>
+        {% if current_user.is_admin %}<a href="/admin/logs">관리자</a>{% endif %}
+        <span class="user">{{ current_user.username }}</span>
+        <form action="/logout" method="post" class="inline">
+          <button type="submit" class="link-btn">로그아웃</button>
+        </form>
+      {% else %}
+        <a href="/login">로그인</a>
+        <a href="/register">회원가입</a>
+      {% endif %}
+    </nav>
+  </header>
+  <main class="container">
+    {% block content %}{% endblock %}
+  </main>
+</body>
+</html>

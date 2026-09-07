@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}AI 챗봇 · 홈{% endblock %}
+{% block content %}
+<section class="hero">
+  <h1>실시간 AI 문의 응답 챗봇</h1>
+  <p>질문을 입력하면 AI가 답변합니다. 대화 내역은 로그인 계정에 누적 저장됩니다.</p>
+  {% if current_user %}
+    <a class="btn" href="/chat">채팅 시작하기</a>
+  {% else %}
+    <a class="btn" href="/register">회원가입</a>
+    <a class="btn ghost" href="/login">로그인</a>
+    <p class="hint">챗봇 기능은 로그인한 사용자만 사용할 수 있습니다.</p>
+  {% endif %}
+</section>
+{% endblock %}

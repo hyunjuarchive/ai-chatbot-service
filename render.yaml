@@ -1,0 +1,36 @@
+# Render 배포 설정 (https://render.com)
+# Dashboard > New > Blueprint 로 이 저장소를 연결하면 자동 적용됩니다.
+services:
+  - type: web
+    name: ai-chatbot
+    runtime: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /healthz
+    envVars:
+      - key: ANTHROPIC_API_KEY
+        sync: false            # 대시보드에서 직접 입력 (저장소에 커밋 안 됨)
+      - key: ANTHROPIC_BASE_URL
+        sync: false            # 서드파티 게이트웨이 사용 시에만 입력, 아니면 비움
+      - key: ANTHROPIC_MODEL
+        value: claude-sonnet-5
+      - key: AI_TIMEOUT_SECONDS
+        value: "30"
+      - key: AI_MAX_CONTEXT_MESSAGES
+        value: "10"
+      - key: SESSION_SECRET
+        generateValue: true    # Render 가 안전한 랜덤값 자동 생성
+      - key: MAX_QUESTION_LENGTH
+        value: "2000"
+      - key: ADMIN_USERNAMES
+        value: admin
+      - key: DATABASE_URL
+        value: sqlite:///./chatbot.db
+    # 무료 플랜은 영구 디스크가 없어 재배포/재시작 시 SQLite 파일이 초기화됩니다.
+    # 데이터를 유지하려면 아래 disk 블록의 주석을 해제(유료)하고
+    # DATABASE_URL 을 sqlite:////var/data/chatbot.db 로 바꾸세요.
+    # disk:
+    #   name: data
+    #   mountPath: /var/data
+    #   sizeGB: 1

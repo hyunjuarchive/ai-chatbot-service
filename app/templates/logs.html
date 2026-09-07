@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block title %}{{ scope }} 대화 로그{% endblock %}
+{% block content %}
+<section>
+  <h1>{{ scope }} 대화 로그</h1>
+  {% if forbidden %}
+    <p class="error">관리자만 접근할 수 있습니다.</p>
+  {% else %}
+  <p class="hint">
+    JSON API: <code>{% if show_user %}/api/admin/logs{% else %}/api/logs{% endif %}</code>
+  </p>
+  <div class="table-scroll">
+  <table class="logs">
+    <thead>
+      <tr>
+        <th>ID</th>{% if show_user %}<th>사용자</th>{% endif %}
+        <th>생성 시각(UTC)</th><th>상태</th><th>지연(ms)</th>
+        <th>질문</th><th>응답 / 오류</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for r in rows %}
+      <tr class="{{ 'row-error' if r.status == 'error' else '' }}">
+        <td>{{ r.id }}</td>
+        {% if show_user %}<td>{{ r.user.username }}</td>{% endif %}
+        <td>{{ r.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+        <td>{{ r.status }}</td>
+        <td>{{ r.latency_ms if r.latency_ms is not none else '-' }}</td>
+        <td class="cell-q">{{ r.question }}</td>
+        <td class="cell-a">{{ r.error_detail if r.status == 'error' else r.answer }}</td>
+      </tr>
+      {% else %}
+      <tr><td colspan="7" class="empty">로그가 없습니다.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  </div>
+  {% endif %}
+</section>
+{% endblock %}
