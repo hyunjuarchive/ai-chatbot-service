@@ -12,7 +12,10 @@ class Settings(BaseSettings):
     )
 
     # --- AI ---
+    # 인증: 공식 Anthropic 은 api_key(x-api-key 헤더),
+    #       게이트웨이(LiteLLM 등)는 보통 auth_token(Authorization: Bearer 헤더)을 쓴다.
     anthropic_api_key: str = ""
+    anthropic_auth_token: str = ""
     # 서드파티 게이트웨이/프록시를 쓸 때만 설정. 비우면 공식 Anthropic 엔드포인트 사용.
     anthropic_base_url: str = ""
     anthropic_model: str = "claude-sonnet-5"
@@ -37,8 +40,8 @@ class Settings(BaseSettings):
 
     @property
     def ai_enabled(self) -> bool:
-        """실제 Anthropic API 키가 설정되어 있으면 True, 아니면 mock 모드."""
-        return bool(self.anthropic_api_key.strip())
+        """API 키 또는 인증 토큰이 있으면 True, 둘 다 없으면 mock 모드."""
+        return bool(self.anthropic_api_key.strip() or self.anthropic_auth_token.strip())
 
 
 @lru_cache

@@ -9,12 +9,14 @@ services:
     startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
     healthCheckPath: /healthz
     envVars:
+      - key: ANTHROPIC_AUTH_TOKEN
+        sync: false            # 게이트웨이 Bearer 토큰. 대시보드에서 직접 입력
       - key: ANTHROPIC_API_KEY
-        sync: false            # 대시보드에서 직접 입력 (저장소에 커밋 안 됨)
+        sync: false            # 공식 Anthropic 직접 사용 시에만
       - key: ANTHROPIC_BASE_URL
-        sync: false            # 서드파티 게이트웨이 사용 시에만 입력, 아니면 비움
+        value: https://copa.codyssey.kr
       - key: ANTHROPIC_MODEL
-        value: claude-sonnet-5
+        value: claude-sonnet-4
       - key: AI_TIMEOUT_SECONDS
         value: "30"
       - key: AI_MAX_CONTEXT_MESSAGES

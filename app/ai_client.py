@@ -49,11 +49,15 @@ _client = None
 def _get_client():
     global _client
     if _client is None:
-        kwargs = dict(
-            api_key=settings.anthropic_api_key,
+        kwargs: dict = dict(
             timeout=settings.ai_timeout_seconds,
             max_retries=1,
         )
+        # Bearer 토큰(게이트웨이) 우선, 없으면 x-api-key
+        if settings.anthropic_auth_token.strip():
+            kwargs["auth_token"] = settings.anthropic_auth_token.strip()
+        else:
+            kwargs["api_key"] = settings.anthropic_api_key
         if settings.anthropic_base_url.strip():
             kwargs["base_url"] = settings.anthropic_base_url.strip()
         _client = anthropic.Anthropic(**kwargs)

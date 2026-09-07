@@ -112,9 +112,12 @@ AI 실패/타임아웃 `503` (서비스는 계속 동작):
 
 | 키 | 필수 | 기본값 | 설명 |
 |---|---|---|---|
-| `ANTHROPIC_API_KEY` | 배포 시 필수 | (없음) | Claude API 키. 없으면 mock 응답 모드 |
-| `ANTHROPIC_BASE_URL` | - | (없음) | 서드파티 게이트웨이/프록시로 Claude 사용 시 그 endpoint. 공식 Anthropic 이면 비움 |
-| `ANTHROPIC_MODEL` | - | `claude-sonnet-5` | 사용할 모델 ID |
+| `ANTHROPIC_API_KEY` | 인증 택1 | (없음) | 공식 Anthropic 키(`x-api-key` 헤더). |
+| `ANTHROPIC_AUTH_TOKEN` | 인증 택1 | (없음) | 게이트웨이 Bearer 토큰(`Authorization: Bearer`). LiteLLM 등. |
+| `ANTHROPIC_BASE_URL` | - | (없음) | 게이트웨이/프록시 endpoint. 공식 Anthropic 이면 비움. 예: `https://copa.codyssey.kr` |
+| `ANTHROPIC_MODEL` | - | `claude-sonnet-5` | 사용할 모델 ID. 게이트웨이면 그쪽 이름(예: `claude-sonnet-4`) |
+
+> `ANTHROPIC_API_KEY` 와 `ANTHROPIC_AUTH_TOKEN` 중 **하나만** 채운다. 둘 다 비면 mock 응답 모드.
 | `AI_TIMEOUT_SECONDS` | - | `30` | AI 호출 타임아웃(초) |
 | `AI_MAX_CONTEXT_MESSAGES` | - | `10` | 프롬프트에 포함할 직전 Q/A 개수 |
 | `SESSION_SECRET` | 배포 시 필수 | (기본값 있음) | 세션 쿠키 서명 키. 배포 시 랜덤값 교체 |

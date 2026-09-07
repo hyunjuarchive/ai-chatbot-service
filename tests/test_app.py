@@ -14,7 +14,10 @@ _TMP_DB = os.path.join(tempfile.gettempdir(), "chatbot_test.db")
 if os.path.exists(_TMP_DB):
     os.remove(_TMP_DB)
 os.environ["DATABASE_URL"] = f"sqlite:///{_TMP_DB}"
-os.environ["ANTHROPIC_API_KEY"] = ""          # mock 모드 강제
+# mock 모드 강제 (.env 파일이 있어도 env 변수가 우선하므로 실호출 안 함)
+os.environ["ANTHROPIC_API_KEY"] = ""
+os.environ["ANTHROPIC_AUTH_TOKEN"] = ""
+os.environ["ANTHROPIC_BASE_URL"] = ""
 os.environ["SESSION_SECRET"] = "test-secret"
 
 from fastapi.testclient import TestClient  # noqa: E402
